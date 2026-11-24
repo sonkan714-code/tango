@@ -1,5 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256"><defs><linearGradient id="a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5AA9FF"/><stop offset="1" stop-color="#1E6FD9"/></linearGradient><linearGradient id="f" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#DDEBFF"/></linearGradient></defs><ellipse cx="128" cy="232" rx="78" ry="10" fill="#000" opacity=".12"/>
-<path d="M36 120l160-40 24 20v60l-160 40-24-20z" fill="url(#a)"/><path d="M36 120l160-40 24 20-160 40z" fill="#8FC4FF"/>
-<path d="M60 140l160-40v60l-160 40z" fill="#1A5FC0"/><path d="M68 150l144-36" stroke="#E6F1FF" stroke-width="6" stroke-linecap="round"/>
-<path d="M200 100c20 10 24 40 10 70-20 10-50 6-60-6 20-20 34-44 50-64z" fill="url(#f)" opacity=".75"/>
-<text x="120" y="176" font-size="18" fill="#fff" font-weight="800" transform="rotate(-14 120 176)" font-family="Helvetica,sans-serif">WRAP</text></svg>

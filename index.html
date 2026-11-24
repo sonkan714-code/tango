@@ -141,6 +141,9 @@ button{cursor:pointer;border:0;background:none}
 @media (prefers-color-scheme: dark){.pic img.ira,.thumb.ira{background:#fff;padding:8px}}
 .pic img.ico{width:min(64%,250px);height:auto;max-height:100%;border-radius:0;filter:drop-shadow(0 14px 22px rgba(0,0,0,.14))}
 .thumb.ico{border-radius:0}
+.pic.photo{padding:12px 16px}
+.pic img.photo{width:100%;height:100%;object-fit:cover;border-radius:20px;box-shadow:0 6px 18px rgba(0,0,0,.12)}
+.thumb.photo{width:88px;height:66px;object-fit:cover;border-radius:12px}
 .pic.emo span{font-size:132px;line-height:1;filter:drop-shadow(0 10px 18px rgba(0,0,0,.12))}
 .dcard{margin-top:12px;width:100%}
 .dcard .emojis{font-size:26px;letter-spacing:2px;margin-top:8px;line-height:1.2}
@@ -283,8 +286,8 @@ footer a{color:var(--label3)}
   <div class="panel" id="panel"></div>
 </div>
 
-<script src="words.js?v=5"></script>
-<script src="daily.js?v=5"></script>
+<script src="words.js?v=6"></script>
+<script src="daily.js?v=6"></script>
 <script>
 // ===== 2週間ごとの自動追加 =====
 // START の日から EVERY 日ごとに、EXTRA の b=1,2,3… の単語が順番に解禁される。
@@ -428,7 +431,7 @@ function showHome(){
           <div class="bottom"><div class="meter"><i style="width:${s.n ? s.d/s.n*100 : 0}%"></i></div>
           <div class="cnt">${s.d} / ${s.n} 語 · <span lang="ko">${s.d} / ${s.n} 단어</span></div></div></div>${ICON.chev}</button>`; })()}
     <p class="next">${next ? `次の${nn}語は ${fmt(next)} に追加（あと${left}日）<br><span lang="ko">다음 ${nn}단어는 ${fmtK(next)}에 추가 (${left}일 후)</span>` : 'すべての単語が出そろいました · <span lang="ko">모든 단어가 추가되었어요</span>'}</p>
-    <footer>イラスト：<a href="https://www.irasutoya.com/">いらすとや</a> ／ <a href="https://github.com/microsoft/fluentui-emoji">Fluent Emoji</a>（© Microsoft, MIT）／ 一部オリジナル</footer>
+    <footer>写真：Wikimedia Commons（<a href="credits.html">写真のクレジット · 사진 출처</a>）／ イラスト：<a href="https://www.irasutoya.com/">いらすとや</a></footer>
   </div>`;
   app.querySelectorAll('.lcard[data-lv]').forEach(b => b.onclick = () => go('#/' + b.dataset.lv));
   $('goDaily').onclick = () => go('#/daily');
@@ -594,7 +597,7 @@ function renderCard(){
       <div class="hint">${themeTag}${tap}</div>`;
   const front = mode === 'ko'
     ? `<div class="kofront"><div class="big" lang="ko">${esc(c.ko)}</div><small>日本語で言うと？ · <span lang="ko">일본어로 하면?</span></small></div><div class="hint">${themeTag}${tap}</div>`
-    : mode === 'pic' && c.img ? `<div class="pic"><img class="${imgCls(c)}" src="${c.img}" alt=""></div><div class="hint">${themeTag}${tap}</div>`
+    : mode === 'pic' && c.img ? `<div class="pic ${imgCls(c)}"><img class="${imgCls(c)}" src="${c.img}" alt=""></div><div class="hint">${themeTag}${tap}</div>`
     : mode === 'pic' && C ? `<div class="kofront"><div class="big" lang="ko">${esc(c.ko)}</div><small>日本語で言うと？ · <span lang="ko">일본어로 하면?</span></small></div><div class="hint">${themeTag}${tap}</div>`
     : clozeHtml;
   const exHtml = c.ex.map(([s, sk, h]) => `<div class="exi"><div class="exj">${esc(s).replace(esc(h), `<b style="color:${col}">${esc(h)}</b>`)}</div><div class="exk" lang="ko">${esc(sk)}</div></div>`).join('');
@@ -615,7 +618,7 @@ function renderCard(){
   attachSwipe(card);
   if (c.a) prefetch(['w'+c.n, 'x'+c.n]); if (deck[pos+1] && deck[pos+1].a) prefetch(['w'+deck[pos+1].n]);
 }
-const imgCls = c => c.a ? 'ira' : 'ico';
+const imgCls = c => c.img && c.img.startsWith('img/p/') ? 'photo' : c.a ? 'ira' : 'ico';
 function speakFull(c){ const t = kana(c.y) + '。' + c.ex.map(x => x[0]).join(''); c.a ? play(['w'+c.n, 'x'+c.n], t) : say(t); }
 function flip(){
   const card = $('card'); if (!card) return;
@@ -694,6 +697,8 @@ function openSheet(){
     </div>
     <div class="sect">単語の追加スケジュール · <span lang="ko">단어 추가 일정</span></div>
     <div class="group"><div class="sched">${sched.join('')}</div></div>
+    <div class="sect"></div>
+    <div class="group"><a class="cell" href="credits.html" style="color:var(--blue);text-decoration:none">写真のクレジット<span lang="ko" style="color:var(--label2);font-size:14px">사진 출처</span></a></div>
     <div class="sect"></div>
     <div class="group"><button class="cell danger" id="reset">覚えた記録をリセット · <span lang="ko">기록 초기화</span></button>
       <div class="confirm" id="confirm"><button class="y" id="resetYes">リセット · <span lang="ko">초기화</span></button><button class="n" id="resetNo">やめる · <span lang="ko">취소</span></button></div></div>`;
