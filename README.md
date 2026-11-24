@@ -70,3 +70,5 @@ git push -u origin main
 ## クレジット
 
 イラスト：[いらすとや](https://www.irasutoya.com/)。個人・非商用の学習サイトなら問題ありませんが、商用で使う場合は「1つの制作物につき20点まで」などの制限があるので、いらすとやの利用規約を確認してください。
+
+3Dの絵：[Fluent Emoji](https://github.com/microsoft/fluentui-emoji)（© Microsoft Corporation、MITライセンス。全文は `img/e/LICENSE.txt`）。`img/c/` の絵（キャベツ・大根・まな板など40点）はこのサイト用に描いたオリジナルです。

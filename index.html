@@ -138,11 +138,16 @@ button{cursor:pointer;border:0;background:none}
 .done-mark{font-size:12px;color:var(--green);font-weight:600}
 .pic{flex:1;display:flex;align-items:center;justify-content:center;padding:14px 28px;min-height:0}
 .pic img{max-width:100%;max-height:100%;object-fit:contain;border-radius:18px}
-@media (prefers-color-scheme: dark){.pic img,.thumb{background:#fff;padding:8px}}
+@media (prefers-color-scheme: dark){.pic img.ira,.thumb.ira{background:#fff;padding:8px}}
+.pic img.ico{width:min(64%,250px);height:auto;max-height:100%;border-radius:0;filter:drop-shadow(0 14px 22px rgba(0,0,0,.14))}
+.thumb.ico{border-radius:0}
 .pic.emo span{font-size:132px;line-height:1;filter:drop-shadow(0 10px 18px rgba(0,0,0,.12))}
 .dcard{margin-top:12px;width:100%}
 .dcard .emojis{font-size:26px;letter-spacing:2px;margin-top:8px;line-height:1.2}
 .tile .ic.emo{background:var(--fill2);font-size:24px}
+.tile .ic.emo img{width:32px;height:32px}
+.dcard .emojis{display:flex;flex-wrap:wrap;gap:4px}
+.dcard .emojis img{width:26px;height:26px}
 .hint{text-align:center;font-size:13px;color:var(--label3);padding:0 0 18px;display:flex;flex-direction:column;align-items:center;gap:8px}
 .th{font-size:12.5px;color:var(--label2);background:var(--fill2);border-radius:99px;padding:4px 12px}
 .kofront{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:24px;text-align:center}
@@ -278,8 +283,8 @@ footer a{color:var(--label3)}
   <div class="panel" id="panel"></div>
 </div>
 
-<script src="words.js"></script>
-<script src="daily.js"></script>
+<script src="words.js?v=5"></script>
+<script src="daily.js?v=5"></script>
 <script>
 // ===== 2週間ごとの自動追加 =====
 // START の日から EVERY 日ごとに、EXTRA の b=1,2,3… の単語が順番に解禁される。
@@ -419,11 +424,11 @@ function showHome(){
         <div class="badge" style="background:linear-gradient(135deg,#30d158,#30b0c7)">🏠</div>
         <div class="body"><div class="t">くらしの単語<span class="ko" lang="ko">생활 단어</span></div>
           <div class="d">名詞だけ · 野菜・台所・服・町など ${DAILY_CATS.length}テーマ<span lang="ko">명사만 · 채소·부엌·옷·동네 등 ${DAILY_CATS.length}개 주제</span></div>
-          <div class="emojis">${DAILY_CATS.map(c => c.e).join('')}</div>
+          <div class="emojis">${DAILY_CATS.map(c => `<img src="${c.img}" alt="">`).join('')}</div>
           <div class="bottom"><div class="meter"><i style="width:${s.n ? s.d/s.n*100 : 0}%"></i></div>
           <div class="cnt">${s.d} / ${s.n} 語 · <span lang="ko">${s.d} / ${s.n} 단어</span></div></div></div>${ICON.chev}</button>`; })()}
     <p class="next">${next ? `次の${nn}語は ${fmt(next)} に追加（あと${left}日）<br><span lang="ko">다음 ${nn}단어는 ${fmtK(next)}에 추가 (${left}일 후)</span>` : 'すべての単語が出そろいました · <span lang="ko">모든 단어가 추가되었어요</span>'}</p>
-    <footer>イラスト：<a href="https://www.irasutoya.com/">いらすとや</a></footer>
+    <footer>イラスト：<a href="https://www.irasutoya.com/">いらすとや</a> ／ <a href="https://github.com/microsoft/fluentui-emoji">Fluent Emoji</a>（© Microsoft, MIT）／ 一部オリジナル</footer>
   </div>`;
   app.querySelectorAll('.lcard[data-lv]').forEach(b => b.onclick = () => go('#/' + b.dataset.lv));
   $('goDaily').onclick = () => go('#/daily');
@@ -478,7 +483,7 @@ function showDailyCats(){
     <div class="navbar"><button class="navback" id="back">${ICON.back}ホーム · <span lang="ko">홈</span></button><button class="iconbtn" id="openSet" aria-label="設定 설정">${ICON.gear}</button></div>
     <h1 class="ltitle">くらしの単語</h1>
     <p class="lsub">テーマを選ぶ · <span lang="ko">주제 선택</span></p>
-    <div class="tiles daily">${DAILY_CATS.map(c => tile(c.v, c.j, c.ko, c.e)).join('')}${tile('all', 'すべてのテーマ', '모든 주제', '🗂️', true)}</div>
+    <div class="tiles daily">${DAILY_CATS.map(c => tile(c.v, c.j, c.ko, `<img src="${c.img}" alt="">`)).join('')}${tile('all', 'すべてのテーマ', '모든 주제', '<img src="img/e/1f5c3.png" alt="">', true)}</div>
     <div class="sect">オプション · <span lang="ko">옵션</span></div>
     <div class="group">
       <label class="cell"><span class="l">まだ覚えていない単語だけ<small lang="ko">아직 못 외운 단어만</small></span>
@@ -589,8 +594,7 @@ function renderCard(){
       <div class="hint">${themeTag}${tap}</div>`;
   const front = mode === 'ko'
     ? `<div class="kofront"><div class="big" lang="ko">${esc(c.ko)}</div><small>日本語で言うと？ · <span lang="ko">일본어로 하면?</span></small></div><div class="hint">${themeTag}${tap}</div>`
-    : mode === 'pic' && c.img ? `<div class="pic"><img src="${c.img}" alt=""></div><div class="hint">${themeTag}${tap}</div>`
-    : mode === 'pic' && c.e ? `<div class="pic emo"><span>${c.e}</span></div><div class="hint">${themeTag}${tap}</div>`
+    : mode === 'pic' && c.img ? `<div class="pic"><img class="${imgCls(c)}" src="${c.img}" alt=""></div><div class="hint">${themeTag}${tap}</div>`
     : mode === 'pic' && C ? `<div class="kofront"><div class="big" lang="ko">${esc(c.ko)}</div><small>日本語で言うと？ · <span lang="ko">일본어로 하면?</span></small></div><div class="hint">${themeTag}${tap}</div>`
     : clozeHtml;
   const exHtml = c.ex.map(([s, sk, h]) => `<div class="exi"><div class="exj">${esc(s).replace(esc(h), `<b style="color:${col}">${esc(h)}</b>`)}</div><div class="exk" lang="ko">${esc(sk)}</div></div>`).join('');
@@ -600,7 +604,7 @@ function renderCard(){
       <div class="ans"><div class="yomi">${c.y}</div><div class="kanji" style="${c.k.length >= 5 ? 'font-size:36px' : ''}">${c.k}</div>
         <div class="kor" lang="ko">${esc(c.ko)}</div>
         ${c.masu ? `<div class="masu">ます形 · ${c.masu}</div>` : ''}
-        <div class="meta"><span>${thJ} · <span lang="ko">${thK}</span></span>${mode !== 'pic' && c.img ? `<img class="thumb" src="${c.img}" alt="">` : ''}</div>
+        <div class="meta"><span>${thJ} · <span lang="ko">${thK}</span></span>${mode !== 'pic' && c.img ? `<img class="thumb ${imgCls(c)}" src="${c.img}" alt="">` : ''}</div>
         ${c.pt ? `<div class="pt"><b>ポイント</b>　${esc(c.pt)}</div>` : ''}
         <button class="speak" id="speak">${ICON.speaker}読み上げ · <span lang="ko">듣기</span></button></div>
       <div class="ex">${exHtml}</div>
@@ -611,6 +615,7 @@ function renderCard(){
   attachSwipe(card);
   if (c.a) prefetch(['w'+c.n, 'x'+c.n]); if (deck[pos+1] && deck[pos+1].a) prefetch(['w'+deck[pos+1].n]);
 }
+const imgCls = c => c.a ? 'ira' : 'ico';
 function speakFull(c){ const t = kana(c.y) + '。' + c.ex.map(x => x[0]).join(''); c.a ? play(['w'+c.n, 'x'+c.n], t) : say(t); }
 function flip(){
   const card = $('card'); if (!card) return;
