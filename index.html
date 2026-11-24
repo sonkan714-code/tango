@@ -3,142 +3,306 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>日本語単語カード N3〜N2</title>
-<meta name="description" content="韓国語話者のための日本語単語カード（N3〜N2）。2週間ごとに新しい単語が追加されます。">
+<title>日本語単語カード N3〜N2 · 일본어 단어 카드</title>
+<meta name="description" content="韓国語話者のための日本語単語カード（N3〜N2）。2週間ごとに新しい単語が追加されます。한국어 화자를 위한 일본어 단어 카드.">
 <meta name="theme-color" content="#f6f5f2">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="単語カード">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <style>
-:root{--n4:#2f6fb0;--n4l:#e7f0fa;--n3:#c0602a;--n3l:#fbede3;--n2:#7a4cb0;--n2l:#f1eafa;--ink:#222;--sub:#777;--bg:#f6f5f2;--ok:#2e9a5e;--ng:#d0533f}
+:root{
+  --bg:#f6f5f2;--card:#fff;--ink:#1f1f1f;--sub:#6b6b6b;--mute:#9a9a9a;--line:#e5e2db;
+  --ok:#2e9a5e;--ng:#d0533f;--accent:#1f1f1f;--new:#e8a317;
+  --n3:#2f6fb0;--n3l:#e7f0fa;--n2:#7a4cb0;--n2l:#f1eafa;
+  --r:14px;--shadow:0 6px 24px rgba(0,0,0,.08);
+}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%}
-body{font-family:"Hiragino Sans","Noto Sans JP","Noto Sans CJK JP",system-ui,sans-serif;background:var(--bg);color:var(--ink);
-  padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);overscroll-behavior:none}
-[lang=ko]{font-family:"Apple SD Gothic Neo","Noto Sans KR","Noto Sans CJK KR",system-ui,sans-serif}
-.app{max-width:460px;margin:0 auto;height:100%;display:flex;flex-direction:column;padding:12px 16px 14px;gap:10px}
-header{display:flex;align-items:center;justify-content:space-between;gap:8px}
-h1{font-size:15px;font-weight:700;letter-spacing:.02em}
-.icon-btn{white-space:nowrap;border:0;background:#fff;border-radius:10px;height:34px;padding:0 11px;font-size:13px;color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.08);cursor:pointer}
-.chips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
-.chip{flex:none;border:1px solid #ddd;background:#fff;border-radius:99px;padding:6px 12px;font-size:12.5px;color:#444;cursor:pointer}
-.chip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
-.progress{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--sub)}
-.bar{flex:1;height:6px;background:#e4e2dc;border-radius:3px;overflow:hidden}
+body{font-family:"Hiragino Sans","Noto Sans JP","Apple SD Gothic Neo","Noto Sans KR",system-ui,sans-serif;background:var(--bg);color:var(--ink);overscroll-behavior:none;
+  padding:env(safe-area-inset-top) env(safe-area-inset-right) 0 env(safe-area-inset-left)}
+[lang=ko],.ko{font-family:"Apple SD Gothic Neo","Noto Sans KR","Noto Sans CJK KR",system-ui,sans-serif}
+button,select,input{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid #7aa7e0;outline-offset:2px}
+.hidden{display:none!important}
+
+/* ---------- layout (mobile first) ---------- */
+.app{height:100dvh;display:flex;flex-direction:column;max-width:520px;margin:0 auto;padding:10px 14px calc(10px + env(safe-area-inset-bottom));gap:9px}
+.side{display:flex;flex-direction:column;gap:8px}
+.main{flex:1;min-height:0;display:flex;flex-direction:column;gap:9px}
+.pc-only{display:none}
+
+/* header */
+.top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.brand{display:flex;flex-direction:column;line-height:1.2;min-width:0}
+.brand b{font-size:16px;letter-spacing:.02em;white-space:nowrap}
+.brand small{font-size:11.5px;color:var(--sub);white-space:nowrap}
+.tbtns{display:flex;gap:6px}
+.ibtn{border:0;background:#fff;border-radius:11px;min-height:38px;padding:4px 10px;box-shadow:0 1px 2px rgba(0,0,0,.08);display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.15}
+.ibtn .j{font-size:12.5px;font-weight:700}
+.ibtn .k{font-size:10px;color:var(--sub)}
+.ibtn:active{transform:scale(.96)}
+
+/* part-of-speech tabs */
+.cats{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}
+.cat{border:1.5px solid var(--line);background:#fff;border-radius:12px;padding:6px 2px 6px;display:flex;flex-direction:column;align-items:center;gap:1px;min-width:0;position:relative;overflow:hidden}
+.cat .lbls{display:flex;flex-direction:column;align-items:center;line-height:1.2}
+.cat .j{font-size:12.5px;font-weight:700;white-space:nowrap}
+.cat .k{font-size:10px;color:var(--sub);white-space:nowrap}
+.cat .n{font-size:10px;color:var(--mute);margin-top:1px}
+.cat .pbar{position:absolute;left:0;bottom:0;height:3px;background:var(--ok);transition:width .3s}
+.cat.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.cat.on .k,.cat.on .n{color:rgba(255,255,255,.75)}
+
+/* filters */
+.frow{display:flex;gap:6px;align-items:center}
+.chips{display:flex;gap:5px;overflow-x:auto;scrollbar-width:none;flex:1}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;border:1px solid var(--line);background:#fff;border-radius:99px;padding:5px 9px;font-size:12px;color:#444;white-space:nowrap}
+.chip .k{font-size:10.5px;color:var(--mute);margin-left:3px}
+.chip .c{font-size:10.5px;color:var(--mute);margin-left:4px}
+.chip.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.chip.on .k,.chip.on .c{color:rgba(255,255,255,.75)}
+.chip.newc{border-color:#f0cf86}
+#selLv{flex:0 0 auto;width:38%}
+.sel{appearance:none;-webkit-appearance:none;border:1px solid var(--line);background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23888'/%3E%3C/svg%3E") no-repeat right 10px center;
+  border-radius:10px;padding:7px 26px 7px 10px;font-size:12.5px;min-width:0;flex:1}
+.news{background:#fff;border-radius:12px;padding:7px 12px;font-size:12px;color:#555;box-shadow:0 1px 2px rgba(0,0,0,.05);display:flex;justify-content:space-between;align-items:center;gap:8px;line-height:1.45}
+.news .k{display:block;font-size:11px;color:var(--mute)}
+.news.fresh{background:#fff4d6;color:#7a5600}
+.news.fresh .k{color:#9a7a2a}
+.news button{border:0;background:#7a5600;color:#fff;border-radius:9px;padding:6px 10px;font-size:12px;white-space:nowrap;line-height:1.2}
+.news button small{display:block;font-size:10px;opacity:.8}
+
+/* view bar */
+.vbar{display:flex;align-items:center;gap:10px}
+.prog{flex:1;display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--sub);white-space:nowrap}
+.bar{flex:1;height:6px;background:#e4e2dc;border-radius:3px;overflow:hidden;min-width:40px}
 .bar i{display:block;height:100%;background:var(--ok);width:0;transition:width .3s}
-.stage{flex:1;position:relative;perspective:1200px;min-height:0;touch-action:pan-y}
+.seg{display:flex;background:#e9e7e1;border-radius:10px;padding:3px;flex:none}
+.seg button{border:0;background:none;padding:5px 10px;border-radius:8px;font-size:12px;color:#555;line-height:1.15;display:flex;flex-direction:column;align-items:center}
+.seg button small{font-size:9.5px;color:var(--mute)}
+.seg button.on{background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.1);color:var(--ink);font-weight:700}
+
+/* card */
+.cardview{flex:1;min-height:0;display:flex;flex-direction:column;gap:10px}
+.stage{flex:1;position:relative;perspective:1200px;min-height:260px;touch-action:pan-y}
 .card{position:absolute;inset:0;transform-style:preserve-3d;transition:transform .45s cubic-bezier(.2,.7,.2,1);cursor:pointer}
 .card.flip{transform:rotateY(180deg)}
 .card.out-l{transition:transform .25s ease-in,opacity .25s;transform:translateX(-120%) rotate(-8deg);opacity:0}
 .card.out-r{transition:transform .25s ease-in,opacity .25s;transform:translateX(120%) rotate(8deg);opacity:0}
-.face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;background:#fff;border-radius:20px;
-  box-shadow:0 6px 24px rgba(0,0,0,.09);overflow:hidden;display:flex;flex-direction:column}
+.face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;background:var(--card);border-radius:20px;box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column}
 .back{transform:rotateY(180deg);overflow-y:auto;-webkit-overflow-scrolling:touch}
-.back .ans{flex:none;padding-top:8px}
-.back .ex{flex:none}
-.top{display:flex;justify-content:space-between;align-items:center;padding:14px 16px 0}
-.lv{color:#fff;font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:99px}
-.tag{font-size:12px;font-weight:700;border:1.5px solid;border-radius:7px;padding:2px 8px}
-.num{font-size:11.5px;color:#aaa}
-.pic{flex:1;display:flex;align-items:center;justify-content:center;padding:10px 22px;min-height:0}
+.ctop{display:flex;justify-content:space-between;align-items:center;padding:13px 16px 0;gap:8px}
+.lv{color:#fff;font-size:11px;font-weight:700;padding:3px 9px;border-radius:99px}
+.newb{background:var(--new);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;margin-left:5px}
+.tag{font-size:11.5px;font-weight:700;border:1.5px solid;border-radius:7px;padding:2px 7px;white-space:nowrap}
+.tag small{font-weight:400;margin-left:3px;opacity:.8}
+.num{font-size:11px;color:#aaa}
+.pic{flex:1;display:flex;align-items:center;justify-content:center;padding:8px 22px;min-height:0}
 .pic img{max-width:100%;max-height:100%;object-fit:contain}
-.hint{text-align:center;font-size:12px;color:#aaa;padding:0 0 14px;display:flex;flex-direction:column;align-items:center;gap:6px}
-.th{font-size:13px;color:#555;background:#f2f1ed;border-radius:99px;padding:3px 12px}
-.kofront{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:20px}
-.kofront .big{font-size:34px;font-weight:700}
+.hint{text-align:center;font-size:11.5px;color:#aaa;padding:0 0 13px;display:flex;flex-direction:column;align-items:center;gap:6px}
+.th{font-size:12px;color:#555;background:#f2f1ed;border-radius:99px;padding:3px 12px}
+.kofront{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:20px;text-align:center}
+.kofront .big{font-size:32px;font-weight:700;line-height:1.3}
 .kofront small{font-size:12px;color:#aaa}
-.cloze{flex:1;display:flex;flex-direction:column;justify-content:center;gap:14px;padding:18px 22px}
-.cloze .lab{font-size:12px;color:#999;letter-spacing:.05em}
+.cloze{flex:1;display:flex;flex-direction:column;justify-content:center;gap:12px;padding:16px 22px;min-height:0}
+.cloze .lab{font-size:11.5px;color:#999}
 .cloze .s{font-size:20px;line-height:1.7;font-weight:600}
 .cloze .blank{display:inline-block;min-width:3.2em;border-bottom:2px solid currentColor;margin:0 2px}
 .cloze .t{font-size:14px;color:#666;line-height:1.5}
 .cloze .m{font-size:15px;font-weight:700}
-.pt{margin:8px 0 0;font-size:13px;line-height:1.55;color:#444;background:#fff8e1;border-radius:10px;padding:8px 10px;text-align:left}
-.pt b{color:#b07a00}
-.ans{flex:1;display:flex;flex-direction:column;justify-content:center;padding:6px 24px 10px;min-height:0}
-.yomi{font-size:17px;color:#555;letter-spacing:.08em}
+.ans{display:flex;flex-direction:column;padding:10px 22px 8px}
+.yomi{font-size:16px;color:#555;letter-spacing:.08em}
 .kanji{font-size:40px;font-weight:800;line-height:1.15;letter-spacing:.03em;margin:2px 0 6px}
-.ko{font-size:19px;font-weight:700}
-.thumb{width:72px;height:56px;object-fit:contain;align-self:flex-end;margin-top:-56px;opacity:.9}
-.ex{margin:0 16px 16px;padding:10px 13px;border-radius:12px;background:#f6f5f2;display:flex;flex-direction:column;gap:8px}
-.exi+.exi{border-top:1px dashed #ddd;padding-top:8px}
-.exj{font-size:14.5px;line-height:1.55}
-.selects{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.selects select{appearance:none;-webkit-appearance:none;border:1px solid #ddd;background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23888'/%3E%3C/svg%3E") no-repeat right 10px center;
-  border-radius:10px;padding:7px 26px 7px 10px;font-size:13px;color:#333;font-family:inherit}
+.kor{font-size:19px;font-weight:700}
 .masu{font-size:13px;color:#555;margin-top:4px}
 .meta{display:flex;align-items:flex-end;justify-content:space-between;font-size:12px;color:#999;margin-top:6px}
-.meta .thumb{margin-top:0}
-.exj b{font-weight:700}
+.thumb{width:72px;height:56px;object-fit:contain;opacity:.9}
+.pt{margin:8px 0 0;font-size:13px;line-height:1.55;color:#444;background:#fff8e1;border-radius:10px;padding:8px 10px}
+.pt b{color:#b07a00}
+.speak{border:1px solid #ddd;background:#fff;border-radius:99px;font-size:12.5px;padding:6px 13px;margin-top:10px;align-self:flex-start}
+.ex{margin:4px 16px 16px;padding:10px 13px;border-radius:12px;background:#f6f5f2;display:flex;flex-direction:column;gap:8px}
+.exi+.exi{border-top:1px dashed #ddd;padding-top:8px}
+.exj{font-size:14.5px;line-height:1.55}
 .exk{font-size:13px;color:#777;line-height:1.5;margin-top:3px}
-.speak{border:0;background:#fff;border:1px solid #ddd;border-radius:99px;font-size:13px;padding:5px 12px;margin-top:10px;align-self:flex-start;cursor:pointer}
-.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.actions button{border:0;border-radius:14px;height:54px;font-size:16px;font-weight:700;color:#fff;cursor:pointer}
+.empty{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center;background:#fff;border-radius:20px;box-shadow:var(--shadow);padding:24px}
+.empty .big{font-size:21px;font-weight:700}
+.empty .big small{display:block;font-size:14px;color:var(--sub);font-weight:400;margin-top:3px}
+.empty p{font-size:13.5px;color:#666;line-height:1.6}
+.empty .btns{display:flex;flex-direction:column;gap:8px;width:100%;max-width:260px}
+.empty button{border:0;background:var(--ink);color:#fff;border-radius:12px;padding:11px 16px;font-size:14px;line-height:1.3}
+.empty button small{display:block;font-size:11px;opacity:.75}
+.empty button.gray{background:#888}
+
+/* actions */
+.actions{display:grid;grid-template-columns:58px 1fr 1fr;gap:8px}
+.actions button{border:0;border-radius:14px;height:56px;font-weight:700;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.2}
+.actions button .j{font-size:16px}
+.actions button .k{font-size:11px;font-weight:400;opacity:.85}
+.actions .prev{background:#fff;color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.1)}
+.actions .prev .j{font-size:18px}
+.actions .prev:disabled{opacity:.35}
 .ng{background:var(--ng)} .ok{background:var(--ok)}
 .actions button:active{transform:scale(.97)}
-.empty{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center;
-  background:#fff;border-radius:20px;box-shadow:0 6px 24px rgba(0,0,0,.09);padding:24px}
-.empty .big{font-size:22px;font-weight:700}
-.empty p{font-size:14px;color:#666;line-height:1.6}
-.empty button{border:0;background:var(--ink);color:#fff;border-radius:12px;padding:12px 20px;font-size:15px;cursor:pointer}
-footer{text-align:center;font-size:11px;color:#aaa}
-footer a{color:#999}
+
+/* list */
+.listview{flex:1;min-height:0;display:flex;flex-direction:column;gap:8px}
+.search{border:1px solid var(--line);background:#fff;border-radius:12px;padding:10px 12px;font-size:14px;width:100%}
+.list{flex:1;overflow-y:auto;background:#fff;border-radius:16px;box-shadow:var(--shadow);-webkit-overflow-scrolling:touch}
+.li{display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid #f0eee9;cursor:pointer}
+.li:last-child{border-bottom:0}
+.li:hover{background:#faf9f6}
+.li .w{display:flex;flex-direction:column;min-width:0}
+.li .w b{font-size:17px}
+.li .w b small{font-size:11.5px;color:var(--sub);font-weight:400;margin-left:6px}
+.li .w span{font-size:13px;color:#555;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.li .p{font-size:10.5px;color:var(--sub);border:1px solid var(--line);border-radius:6px;padding:1px 6px;white-space:nowrap}
+.li .chk{width:32px;height:32px;border-radius:50%;border:1.5px solid var(--line);background:#fff;font-size:15px;color:transparent;display:flex;align-items:center;justify-content:center}
+.li .chk.on{background:var(--ok);border-color:var(--ok);color:#fff}
+.lempty{padding:30px;text-align:center;color:var(--mute);font-size:13px}
+
+/* settings */
 .sheet{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:flex-end;justify-content:center;z-index:5}
 .sheet.show{display:flex}
-.panel{background:#fff;width:100%;max-width:460px;border-radius:18px 18px 0 0;padding:18px 18px calc(18px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:14px}
+.panel{background:#fff;width:100%;max-width:520px;max-height:88dvh;overflow-y:auto;border-radius:18px 18px 0 0;padding:18px 18px calc(18px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:14px}
 .panel h2{font-size:16px}
+.panel h2 small{font-size:12px;color:var(--sub);font-weight:400;margin-left:6px}
 .row{display:flex;justify-content:space-between;align-items:center;font-size:14px;gap:10px}
-.seg{display:flex;background:#eee;border-radius:10px;padding:3px}
-.seg button{border:0;background:none;padding:7px 11px;border-radius:8px;font-size:13px;cursor:pointer;color:#444}
-.seg button.on{background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.1);color:var(--ink);font-weight:700}
-.danger{border:1px solid #e3b2aa;color:var(--ng);background:#fff;border-radius:10px;padding:10px;font-size:14px;cursor:pointer}
-.close{border:0;background:var(--ink);color:#fff;border-radius:12px;padding:12px;font-size:15px;cursor:pointer}
+.row .lbl{line-height:1.25}
+.row .lbl small{display:block;font-size:11px;color:var(--mute)}
+.sched{font-size:12.5px;color:#666;line-height:1.75;max-height:24vh;overflow-y:auto;background:#f6f5f2;border-radius:10px;padding:8px 12px}
+.sched .done{color:var(--ok)}
+.danger{border:1px solid #e3b2aa;color:var(--ng);background:#fff;border-radius:10px;padding:10px;font-size:14px}
+.close{border:0;background:var(--ink);color:#fff;border-radius:12px;padding:12px;font-size:15px}
 .confirm{display:none;gap:8px}
 .confirm.show{display:flex}
 .confirm button{flex:1}
+.keys{font-size:12px;color:var(--sub);line-height:1.9}
+kbd{display:inline-block;min-width:22px;text-align:center;border:1px solid #ccc;border-bottom-width:2px;border-radius:5px;padding:0 5px;font-size:11px;background:#fff;color:#333;font-family:inherit}
+footer{text-align:center;font-size:10.5px;color:#aaa}
+footer a{color:#999}
 
-.news{background:#fff;border-radius:12px;padding:8px 12px;font-size:12.5px;color:#555;box-shadow:0 1px 2px rgba(0,0,0,.06);display:flex;justify-content:space-between;align-items:center;gap:8px}
-.news.fresh{background:#fff4d6;color:#7a5600}
-.news b{font-weight:700}
-.news button{border:0;background:#7a5600;color:#fff;border-radius:8px;padding:5px 10px;font-size:12px;cursor:pointer;white-space:nowrap}
-.newb{background:#e8a317;color:#fff;font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:99px;margin-left:6px}
-.sched{font-size:12.5px;color:#666;line-height:1.7;max-height:24vh;overflow-y:auto;background:#f6f5f2;border-radius:10px;padding:8px 12px}
-.sched .done{color:#2e9a5e}
+/* ---------- PC ---------- */
+@media (min-width:900px){
+  .app{max-width:1180px;display:grid;grid-template-columns:320px 1fr;grid-template-rows:auto 1fr;gap:18px 26px;padding:22px 28px 18px}
+  .top{grid-column:1 / -1}
+  .brand b{font-size:20px}
+  .brand small{font-size:12.5px}
+  .ibtn{min-height:44px;padding:5px 14px}
+  .ibtn .j{font-size:13.5px}
+  .side{overflow-y:auto;gap:14px;padding-bottom:6px}
+  .pc-only{display:block}
+  .sec{font-size:11.5px;color:var(--mute);font-weight:700;letter-spacing:.05em;margin-bottom:-6px}
+  .cats{grid-template-columns:1fr;gap:6px}
+  .cat{flex-direction:row;justify-content:space-between;padding:11px 14px;gap:8px;border-radius:12px}
+  .cat .lbls{flex-direction:row;align-items:baseline;gap:8px}
+  .cat .j{font-size:15px}
+  .cat .k{font-size:12px}
+  .cat .n{font-size:12px;margin:0}
+  .cat .pbar{height:3px}
+  .cat:hover:not(.on){border-color:#cfcabe}
+  .frow{flex-wrap:wrap}
+  .chips{flex-wrap:wrap;overflow:visible}
+  .chip{font-size:13px;padding:6px 12px}
+  .sel{font-size:13.5px;padding:9px 28px 9px 12px}
+  .news{font-size:13px;padding:10px 14px}
+  .main{gap:14px;min-width:0}
+  .stage{max-width:620px;width:100%;margin:0 auto;min-height:440px}
+  .actions{max-width:620px;width:100%;margin:0 auto;grid-template-columns:90px 1fr 1fr}
+  .actions button{height:60px}
+  .kanji{font-size:52px}
+  .kor{font-size:21px}
+  .cloze .s{font-size:23px}
+  .kofront .big{font-size:40px}
+  .panel{border-radius:18px;margin:auto;max-width:480px}
+  .sheet{align-items:center}
+  .list{max-width:820px;width:100%;margin:0 auto}
+  .search{max-width:820px;margin:0 auto}
+  .li{padding:12px 18px}
+  .keyhint{max-width:620px;width:100%;margin:0 auto;text-align:center;font-size:12px;color:var(--mute)}
+}
+@media (max-width:899px){ .keyhint{display:none} }
+@media (max-height:700px) and (max-width:899px){
+  .app{gap:7px;padding-top:8px}
+  .cat{padding:5px 2px}
+  .actions button{height:50px}
+  .kanji{font-size:34px}
+  footer{display:none}
+}
 </style>
 </head>
 <body>
-<body>
 <div class="app">
-  <header>
-    <h1 style="white-space:nowrap">単語カード <span style="color:#999;font-weight:400;font-size:13px">N3〜N2・<span id="total"></span>語</span></h1>
-    <div style="display:flex;gap:6px">
-      <button class="icon-btn" id="shuffle">シャッフル</button>
-      <button class="icon-btn" id="openSet">設定</button>
+  <header class="top">
+    <div class="brand"><b>日本語 単語カード</b><small><span lang="ko">일본어 단어 카드</span> · N3〜N2 · <span id="total"></span>語</small></div>
+    <div class="tbtns">
+      <button class="ibtn" id="shuffle" title="シャッフル (R)"><span class="j">シャッフル</span><span class="k" lang="ko">섞기</span></button>
+      <button class="ibtn" id="openSet"><span class="j">設定</span><span class="k" lang="ko">설정</span></button>
     </div>
   </header>
-  <div class="news" id="news"></div>
-  <div class="chips" id="chips"></div>
-  <div class="selects"><select id="selPos"></select><select id="selTheme"></select></div>
-  <div class="progress"><div class="bar"><i id="bar"></i></div><span id="count"></span></div>
-  <div class="stage" id="stage"></div>
-  <div class="actions"><button class="ng" id="ng">まだ</button><button class="ok" id="ok">覚えた</button></div>
-  <footer>タップで裏返す・スワイプで答える ／ イラスト：<a href="https://www.irasutoya.com/">いらすとや</a></footer>
+
+  <aside class="side">
+    <div class="sec pc-only">品詞 · <span lang="ko">품사</span></div>
+    <nav class="cats" id="cats" aria-label="品詞"></nav>
+    <div class="sec pc-only">しぼりこみ · <span lang="ko">필터</span></div>
+    <div class="frow"><div class="chips" id="stChips"></div></div>
+    <div class="frow"><select class="sel" id="selLv" aria-label="レベル"></select><select class="sel" id="selTheme" aria-label="テーマ"></select></div>
+    <div class="news" id="news"></div>
+    <div class="pc-only keys" id="keys">
+      <div class="sec" style="margin-bottom:4px">キーボード · <span lang="ko">단축키</span></div>
+      <div><kbd>Space</kbd> 裏返す · <span lang="ko">뒤집기</span></div>
+      <div><kbd>→</kbd> 覚えた · <span lang="ko">외웠어요</span>　<kbd>←</kbd> まだ · <span lang="ko">아직</span></div>
+      <div><kbd>↑</kbd> 前のカード · <span lang="ko">이전 카드</span>　<kbd>S</kbd> 読み上げ · <span lang="ko">듣기</span></div>
+      <div><kbd>L</kbd> カード／一覧 · <span lang="ko">카드/목록</span></div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="vbar">
+      <div class="prog"><div class="bar"><i id="bar"></i></div><span id="count"></span></div>
+      <div class="seg" id="viewSeg">
+        <button data-v="card">カード<small lang="ko">카드</small></button>
+        <button data-v="list">一覧<small lang="ko">목록</small></button>
+      </div>
+    </div>
+    <section class="cardview" id="cardView">
+      <div class="stage" id="stage"></div>
+      <div class="actions">
+        <button class="prev" id="prev" title="前のカード (↑)" aria-label="前のカード 이전 카드"><span class="j">↩</span><span class="k" lang="ko">이전</span></button>
+        <button class="ng" id="ng"><span class="j">まだ</span><span class="k" lang="ko">아직 몰라요</span></button>
+        <button class="ok" id="ok"><span class="j">覚えた</span><span class="k" lang="ko">외웠어요</span></button>
+      </div>
+      <div class="keyhint">クリックで裏返す · 클릭해서 뒤집기　／　<kbd>Space</kbd> <kbd>←</kbd> <kbd>→</kbd></div>
+    </section>
+    <section class="listview hidden" id="listView">
+      <input class="search" id="search" type="search" placeholder="検索：漢字・よみ・한국어  /  검색" autocomplete="off">
+      <div class="list" id="list"></div>
+    </section>
+    <footer>イラスト：<a href="https://www.irasutoya.com/">いらすとや</a></footer>
+  </main>
 </div>
-<div class="sheet" id="sheet">
+
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-label="設定">
   <div class="panel">
-    <h2>設定</h2>
-    <div class="row"><span>表に出すもの</span>
-      <div class="seg" id="modeSeg"><button data-m="pic">イラスト</button><button data-m="ko" lang="ko">한국어</button></div></div>
-    <div class="row"><span>読み上げ（裏面）</span>
-      <div class="seg" id="ttsSeg"><button data-t="1">オン</button><button data-t="0">オフ</button></div></div>
-    <div class="row"><span>追加スケジュール</span></div>
+    <h2>設定<small lang="ko">설정</small></h2>
+    <div class="row"><span class="lbl">表に出すもの<small lang="ko">카드 앞면</small></span>
+      <div class="seg" id="modeSeg">
+        <button data-m="pic">イラスト<small lang="ko">그림</small></button>
+        <button data-m="ko">韓国語<small lang="ko">한국어</small></button>
+        <button data-m="cloze">穴埋め<small lang="ko">빈칸</small></button>
+      </div></div>
+    <div class="row"><span class="lbl">自動読み上げ<small lang="ko">뒤집으면 자동 듣기</small></span>
+      <div class="seg" id="ttsSeg"><button data-t="1">オン<small lang="ko">켜기</small></button><button data-t="0">オフ<small lang="ko">끄기</small></button></div></div>
+    <div class="row"><span class="lbl">追加スケジュール<small lang="ko">단어 추가 일정</small></span></div>
     <div class="sched" id="sched"></div>
-    <button class="danger" id="reset">覚えた記録をリセット</button>
-    <div class="confirm" id="confirm"><button class="danger" id="resetYes">リセットする</button><button class="close" id="resetNo" style="background:#888">やめる</button></div>
-    <button class="close" id="closeSet">閉じる</button>
+    <button class="danger" id="reset">覚えた記録をリセット · <span lang="ko">기록 초기화</span></button>
+    <div class="confirm" id="confirm"><button class="danger" id="resetYes">リセットする · <span lang="ko">초기화</span></button><button class="close" id="resetNo" style="background:#888">やめる · <span lang="ko">취소</span></button></div>
+    <button class="close" id="closeSet">閉じる · <span lang="ko">닫기</span></button>
   </div>
 </div>
+
 <script src="words.js"></script>
 <script>
 // ===== 2週間ごとの自動追加 =====
@@ -156,105 +320,194 @@ const daysSince = Math.round((today() - startD) / 86400000);
 const released = Math.max(0, Math.min(MAXB, Math.floor(daysSince / EVERY)));
 const releaseDate = b => new Date(startD.getFullYear(), startD.getMonth(), startD.getDate() + b * EVERY);
 const fmt = d => `${d.getMonth()+1}月${d.getDate()}日`;
+const fmtK = d => `${d.getMonth()+1}월 ${d.getDate()}일`;
 const CARDS = BASE.concat(EXTRA.filter(c => c.b <= released));
-const COL = {N3:['var(--n4)','var(--n4l)'], N2:['var(--n2)','var(--n2l)']};
+
+// ===== 表示ラベル（日本語・韓国語） =====
+const POS = [['all','すべて','전체'],['名詞','名詞','명사'],['動詞','動詞','동사'],['い形容詞','い形容詞','い형용사'],['な形容詞','な形容詞','な형용사']];
+const POS_KO = Object.fromEntries(POS.map(([v,,k]) => [v, k]));
+const ST = [['all','全部','전체'],['todo','まだ','미암기'],['done','覚えた','암기'],['new','新着','NEW']];
+const THEMES = [['自然・災害','자연·재해'],['家・生活','집·생활'],['町・社会','거리·사회'],['体・健康','몸·건강'],['料理','요리'],['動作','동작'],['気持ち','감정'],['性格・様子','성격·모습']];
+const TH_KO = Object.fromEntries(THEMES);
+const COL = {N3:['var(--n3)','var(--n3l)'], N2:['var(--n2)','var(--n2l)']};
+
 const store = {
   get(k, d){ try{ const v = localStorage.getItem('tango2_'+k); return v===null ? d : JSON.parse(v) }catch(e){ return d } },
   set(k, v){ try{ localStorage.setItem('tango2_'+k, JSON.stringify(v)) }catch(e){} }
 };
 let known = new Set(store.get('known100', []));
 const seenB = store.get('seenB', 0);
-let filter = store.get('filter', 'all');
-let posF = store.get('posF', 'all');
+let posF = store.get('posF', 'all'); if (!POS.some(p => p[0] === posF)) posF = 'all';
+let lvF = store.get('lvF', 'all');
+let stF = store.get('stF', 'all'); if (stF === 'new' && !released) stF = 'all';
 let themeF = store.get('themeF', 'all');
 let mode = store.get('mode', 'pic');
 let tts = store.get('tts', 1);
-let deck = [], pos = 0, flipped = false;
+let view = store.get('view', 'card');
+let deck = [], pos = 0, flipped = false, query = '';
+const isPC = () => matchMedia('(min-width:900px)').matches;
+const $ = id => document.getElementById(id);
+function esc(s){ return String(s).replace(/[&<>"]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m])); }
 
-const FILTERS = [['all','すべて'],['N3','N3'],['N2','N2'],['todo','まだ']].concat(released ? [['new','新着']] : []);
-if (filter === 'new' && !released) filter = 'all';
-const POS = [['all','品詞：すべて'],['名詞','名詞'],['動詞','動詞'],['形容詞','形容詞']];
-const THEMES = ["自然・災害", "家・生活", "町・社会", "体・健康", "料理", "動作", "気持ち", "性格・様子"];
-const chips = document.getElementById('chips');
-const selPos = document.getElementById('selPos'), selTheme = document.getElementById('selTheme');
-selPos.innerHTML = POS.map(([v,l]) => `<option value="${v}">${l}</option>`).join('');
-selTheme.innerHTML = `<option value="all">テーマ：すべて</option>` + THEMES.map(t => `<option value="${t}">${t}</option>`).join('');
-selPos.value = posF; selTheme.value = themeF;
-selPos.onchange = () => { posF = selPos.value; store.set('posF', posF); build(false); };
-selTheme.onchange = () => { themeF = selTheme.value; store.set('themeF', themeF); build(false); };
-function base(c){ return (posF==='all' || (posF==='形容詞' ? c.pos.endsWith('形容詞') : c.pos===posF)) && (themeF==='all' || c.th===themeF); }
-function drawChips(){
-  chips.innerHTML = '';
-  for (const [k, label] of FILTERS){
-    const b = document.createElement('button');
-    b.className = 'chip' + (filter===k ? ' on' : '');
-    const n = CARDS.filter(c => match(c, k)).length;
-    b.textContent = `${label} ${n}`;
-    b.onclick = () => { filter = k; store.set('filter', k); build(false); };
-    chips.appendChild(b);
-  }
+// ===== しぼりこみ =====
+const inPos = (c, p) => p === 'all' || c.pos === p;
+const stOk = (c, s) => s === 'all' || (s === 'todo' ? !known.has(c.n) : s === 'done' ? known.has(c.n) : !!c.b && c.b === released);
+const baseOk = c => (lvF === 'all' || c.lv === lvF) && (themeF === 'all' || c.th === themeF);
+const pass = c => inPos(c, posF) && baseOk(c) && stOk(c, stF);
+
+function drawFilters(){
+  $('cats').innerHTML = POS.map(([v, j, k]) => {
+    const all = CARDS.filter(c => inPos(c, v) && baseOk(c));
+    const done = all.filter(c => known.has(c.n)).length;
+    return `<button class="cat${posF === v ? ' on' : ''}" data-p="${v}" aria-pressed="${posF === v}">
+      <span class="lbls"><span class="j">${j}</span><span class="k" lang="ko">${k}</span></span>
+      <span class="n">${done}/${all.length}</span><i class="pbar" style="width:${all.length ? done/all.length*100 : 0}%"></i></button>`;
+  }).join('');
+  $('stChips').innerHTML = ST.filter(([v]) => v !== 'new' || released).map(([v, j, k]) => {
+    const n = CARDS.filter(c => inPos(c, posF) && baseOk(c) && stOk(c, v)).length;
+    return `<button class="chip${stF === v ? ' on' : ''}${v === 'new' ? ' newc' : ''}" data-s="${v}">${j}<span class="k" lang="ko">${k}</span><span class="c">${n}</span></button>`;
+  }).join('');
 }
-function match(c, k){ return base(c) && (k==='all' || (k==='todo' ? !known.has(c.n) : k==='new' ? c.b===released : c.lv===k)); }
+$('cats').onclick = e => { const b = e.target.closest('.cat'); if (!b) return; posF = b.dataset.p; store.set('posF', posF); build(false); };
+$('stChips').onclick = e => { const b = e.target.closest('.chip'); if (!b) return; stF = b.dataset.s; store.set('stF', stF); build(false); };
+$('selLv').innerHTML = [['all','N3+N2 · 전체'],['N3','N3のみ · N3만'],['N2','N2のみ · N2만']].map(([v,l]) => `<option value="${v}">${l}</option>`).join('');
+$('selTheme').innerHTML = `<option value="all">全テーマ · 전체 테마</option>` + THEMES.map(([t,k]) => `<option value="${t}">${t} · ${k}</option>`).join('');
+$('selLv').value = lvF; $('selTheme').value = themeF;
+$('selLv').onchange = () => { lvF = $('selLv').value; store.set('lvF', lvF); build(false); };
+$('selTheme').onchange = () => { themeF = $('selTheme').value; store.set('themeF', themeF); build(false); };
+
 function build(shuffle){
-  deck = CARDS.filter(c => match(c, filter));
-  if (filter !== 'todo') deck = deck.filter(c => !known.has(c.n)).concat(deck.filter(c => known.has(c.n)));
+  deck = CARDS.filter(pass);
+  if (stF === 'all') deck = deck.filter(c => !known.has(c.n)).concat(deck.filter(c => known.has(c.n)));
   if (shuffle) for (let i = deck.length-1; i > 0; i--){ const j = Math.floor(Math.random()*(i+1)); [deck[i], deck[j]] = [deck[j], deck[i]]; }
-  pos = 0; drawChips(); render();
+  pos = 0; drawFilters(); drawProgress(); render(); renderList();
 }
-function esc(s){ return s.replace(/[&<>"]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m])); }
-const stage = document.getElementById('stage');
+function drawProgress(){
+  const total = deck.length, doneN = deck.filter(c => known.has(c.n)).length;
+  const scope = CARDS.filter(c => inPos(c, posF) && baseOk(c));
+  const sDone = scope.filter(c => known.has(c.n)).length;
+  $('bar').style.width = (scope.length ? sDone/scope.length*100 : 0) + '%';
+  $('count').innerHTML = `覚えた <span lang="ko">암기</span> ${sDone} / ${scope.length}`;
+}
+
+// ===== カード =====
+const stage = $('stage');
+function tagHtml(c, col){ return `<span class="tag" style="color:${col};border-color:${col}">${c.pos}<small lang="ko">${POS_KO[c.pos] || ''}</small></span>`; }
 function render(){
   flipped = false;
-  const total = CARDS.filter(c => match(c, filter)).length;
-  const doneN = CARDS.filter(c => match(c, filter) && known.has(c.n)).length;
-  document.getElementById('bar').style.width = (total ? doneN/total*100 : 0) + '%';
-  document.getElementById('count').textContent = `覚えた ${doneN} / ${total}`;
+  $('prev').disabled = pos <= 0;
   if (pos >= deck.length){
-    const allDone = total && doneN === total;
-    stage.innerHTML = `<div class="empty"><div class="big">${allDone ? 'ぜんぶ覚えました！' : (deck.length ? '1周おわり' : 'カードがありません')}</div>
-      <p>${deck.length ? '「まだ」のカードだけをもう一度やるか、<br>最初からシャッフルしてやり直せます。' : 'ほかの絞り込みを選んでください。'}</p>
-      ${deck.length ? '<button id="again">「まだ」だけもう一度</button><button id="restart" style="background:#888">最初から</button>' : ''}</div>`;
-    const a = document.getElementById('again'); if (a) a.onclick = () => { filter='todo'; store.set('filter','todo'); build(true); };
-    const r = document.getElementById('restart'); if (r) r.onclick = () => build(true);
+    const scope = CARDS.filter(c => inPos(c, posF) && baseOk(c));
+    const allDone = scope.length && scope.every(c => known.has(c.n));
+    const hasTodo = scope.some(c => !known.has(c.n));
+    stage.innerHTML = `<div class="empty">
+      <div class="big">${allDone ? 'ぜんぶ覚えました！<small lang="ko">모두 외웠어요!</small>' : deck.length ? '1周おわり<small lang="ko">한 바퀴 끝!</small>' : 'カードがありません<small lang="ko">카드가 없어요</small>'}</div>
+      <p>${deck.length ? '' : 'ほかの品詞やしぼりこみを選んでください。<br><span lang="ko">다른 품사나 필터를 선택해 주세요.</span>'}</p>
+      <div class="btns">
+        ${hasTodo && deck.length ? '<button id="again">「まだ」だけもう一度<small lang="ko">모르는 단어만 다시</small></button>' : ''}
+        ${deck.length ? '<button id="restart" class="gray">最初からシャッフル<small lang="ko">처음부터 섞어서</small></button>' : ''}
+        ${!deck.length && (stF !== 'all' || lvF !== 'all' || themeF !== 'all') ? '<button id="clearF">しぼりこみを解除<small lang="ko">필터 해제</small></button>' : ''}
+      </div></div>`;
+    const a = $('again'); if (a) a.onclick = () => { stF = 'todo'; store.set('stF', stF); build(true); };
+    const r = $('restart'); if (r) r.onclick = () => build(true);
+    const cf = $('clearF'); if (cf) cf.onclick = () => { stF = 'all'; lvF = 'all'; themeF = 'all'; ['stF','lvF','themeF'].forEach(k => store.set(k, 'all')); $('selLv').value = 'all'; $('selTheme').value = 'all'; build(false); };
     toggleActions(false); return;
   }
   toggleActions(true);
   const c = deck[pos], [col, light] = COL[c.lv];
   const exHtml = c.ex.map(([s, sk, h]) => `<div class="exi"><div class="exj">${esc(s).replace(esc(h), `<b style="color:${col}">${esc(h)}</b>`)}</div><div class="exk" lang="ko">${esc(sk)}</div></div>`).join('');
-  const top = `<div class="top"><span><span class="lv" style="background:${col}">${c.lv}</span>${c.b && c.b===released ? '<span class="newb">NEW</span>' : ''}</span>
-      <span class="num">${pos+1} / ${deck.length}${known.has(c.n) ? ' ・ 覚えた' : ''}</span>
-      <span class="tag" style="color:${col};border-color:${col}">${c.pos}</span></div>`;
+  const top = `<div class="ctop"><span><span class="lv" style="background:${col}">${c.lv}</span>${c.b && c.b === released ? '<span class="newb">NEW</span>' : ''}</span>
+      <span class="num">${pos+1} / ${deck.length}${known.has(c.n) ? ' · ✓' : ''}</span>${tagHtml(c, col)}</div>`;
+  const tap = isPC() ? 'クリックで答え · <span lang="ko">클릭해서 정답 보기</span>' : 'タップで答え · <span lang="ko">탭해서 정답 보기</span>';
+  const themeTag = `<span class="th">${c.th} · <span lang="ko">${TH_KO[c.th] || ''}</span></span>`;
   const [s0, sk0, h0] = c.ex[0];
-  const cloze = `<div class="cloze"><div class="lab">（　）に入る言葉は？</div>
+  const cloze = `<div class="cloze"><div class="lab">（　）に入る言葉は？ · <span lang="ko">빈칸에 들어갈 말은?</span></div>
       <div class="s">${esc(s0).replace(esc(h0), `<span class="blank" style="color:${col}"></span>`)}</div>
       <div class="t" lang="ko">${esc(sk0)}</div><div class="m" lang="ko" style="color:${col}">${esc(c.ko)}</div></div>
-      <div class="hint"><span class="th">${c.th}</span>タップして答えを見る</div>`;
-  const front = mode === 'pic'
-    ? (c.img ? `<div class="pic"><img src="${c.img}" alt=""></div><div class="hint"><span class="th">${c.th}</span>タップして答えを見る</div>` : cloze)
-    : `<div class="kofront"><div class="big" lang="ko">${esc(c.ko)}</div><small>日本語で言うと？（タップで答え）</small></div>`;
+      <div class="hint">${themeTag}${tap}</div>`;
+  const front = mode === 'ko'
+    ? `<div class="kofront"><div class="big" lang="ko">${esc(c.ko)}</div><small>日本語で言うと？ · <span lang="ko">일본어로 하면?</span></small></div><div class="hint">${themeTag}${tap}</div>`
+    : mode === 'pic' && c.img
+      ? `<div class="pic"><img src="${c.img}" alt=""></div><div class="hint">${themeTag}${tap}</div>`
+      : cloze;
   stage.innerHTML = `<div class="card" id="card">
     <div class="face front" style="border-top:6px solid ${light}">${top}${front}</div>
     <div class="face back" style="border-top:6px solid ${light}">${top}
-      <div class="ans"><div class="yomi">${c.y}</div><div class="kanji" style="${c.k.length>=4?'font-size:38px':''}">${c.k}</div>
-        <div class="ko" lang="ko">${esc(c.ko)}</div>
+      <div class="ans"><div class="yomi">${c.y}</div><div class="kanji" style="${c.k.length >= 5 ? 'font-size:34px' : ''}">${c.k}</div>
+        <div class="kor" lang="ko">${esc(c.ko)}</div>
         ${c.masu ? `<div class="masu">ます形：${c.masu}</div>` : ''}
-        <div class="meta">${c.th}${mode==='ko' && c.img ? `<img class="thumb" src="${c.img}" alt="">` : ''}</div>
+        <div class="meta"><span>${c.th} · <span lang="ko">${TH_KO[c.th] || ''}</span></span>${mode !== 'pic' && c.img ? `<img class="thumb" src="${c.img}" alt="">` : ''}</div>
         <div class="pt"><b>ポイント</b>　${esc(c.pt)}</div>
-        <button class="speak" id="speak">🔊 読み上げ</button></div>
+        <button class="speak" id="speak">🔊 読み上げ · <span lang="ko">듣기</span></button></div>
       <div class="ex">${exHtml}</div>
     </div></div>`;
-  const card = document.getElementById('card');
+  const card = $('card');
   card.addEventListener('click', e => { if (e.target.closest('.speak')) return; flip(); });
-  document.getElementById('speak').onclick = e => { e.stopPropagation(); const t = kana(c.y) + '。' + c.ex.map(x => x[0]).join(''); c.a ? play(['w'+c.n, 'x'+c.n], t) : say(t); };
+  $('speak').onclick = e => { e.stopPropagation(); speakFull(c); };
   attachSwipe(card);
   if (c.a) prefetch(['w'+c.n, 'x'+c.n]); if (deck[pos+1] && deck[pos+1].a) prefetch(['w'+deck[pos+1].n]);
 }
-function toggleActions(on){ for (const id of ['ok','ng']) document.getElementById(id).style.visibility = on ? 'visible' : 'hidden'; }
+function speakFull(c){ const t = kana(c.y) + '。' + c.ex.map(x => x[0]).join(''); c.a ? play(['w'+c.n, 'x'+c.n], t) : say(t); }
+function toggleActions(on){ for (const id of ['ok','ng']) $(id).style.visibility = on ? 'visible' : 'hidden'; }
 function flip(){
-  const card = document.getElementById('card'); if (!card) return;
+  const card = $('card'); if (!card) return;
   flipped = !flipped; card.classList.toggle('flip', flipped);
   if (flipped && tts){ const c = deck[pos]; c.a ? play(['w'+c.n], kana(c.y)) : say(kana(c.y)); }
 }
+function answer(ok){
+  const c = deck[pos]; if (!c) return;
+  if (ok) known.add(c.n); else known.delete(c.n);
+  store.set('known100', [...known]);
+  const card = $('card');
+  card.classList.remove('flip'); card.classList.add(ok ? 'out-r' : 'out-l');
+  setTimeout(() => { pos++; drawFilters(); drawProgress(); render(); renderList(); }, 230);
+}
+function prev(){ if (pos > 0){ pos--; render(); } }
+function attachSwipe(card){
+  let x0 = null, y0 = null, dx = 0, moved = false;
+  card.addEventListener('touchstart', e => { x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; dx = 0; moved = false; }, {passive:true});
+  card.addEventListener('touchmove', e => {
+    if (x0 === null) return;
+    dx = e.touches[0].clientX - x0; const dy = e.touches[0].clientY - y0;
+    if (Math.abs(dx) > 12 && Math.abs(dx) > Math.abs(dy)){ moved = true;
+      card.style.transition = 'none';
+      card.style.transform = `translateX(${dx}px) rotate(${dx/25}deg)` + (flipped ? ' rotateY(180deg)' : ''); }
+  }, {passive:true});
+  card.addEventListener('touchend', e => {
+    card.style.transition = ''; card.style.transform = '';
+    if (moved){ e.preventDefault(); if (Math.abs(dx) > 90) answer(dx > 0); }
+    x0 = null;
+  });
+}
+
+// ===== 一覧 =====
+function renderList(){
+  if (view !== 'list') return;
+  const q = query.trim().toLowerCase();
+  const rows = deck.map((c, i) => [c, i]).filter(([c]) => !q || [c.k, c.y, c.ko].some(s => s.toLowerCase().includes(q)));
+  $('list').innerHTML = rows.length ? rows.map(([c, i]) => `<div class="li" data-i="${i}">
+      <div class="w"><b>${c.k}<small>${c.y}</small></b><span lang="ko">${esc(c.ko)}</span></div>
+      <span class="p">${c.pos} · <span lang="ko">${POS_KO[c.pos] || ''}</span></span>
+      <button class="chk${known.has(c.n) ? ' on' : ''}" data-n="${c.n}" aria-label="覚えた 외웠어요" title="覚えた · 외웠어요">✓</button></div>`).join('')
+    : '<div class="lempty">見つかりません · <span lang="ko">결과가 없어요</span></div>';
+}
+$('list').onclick = e => {
+  const chk = e.target.closest('.chk');
+  if (chk){ const n = +chk.dataset.n; known.has(n) ? known.delete(n) : known.add(n); store.set('known100', [...known]); drawFilters(); drawProgress(); chk.classList.toggle('on', known.has(n)); return; }
+  const li = e.target.closest('.li'); if (!li) return;
+  pos = +li.dataset.i; setView('card'); render();
+};
+$('search').oninput = e => { query = e.target.value; renderList(); };
+function setView(v){
+  view = v; store.set('view', v);
+  $('cardView').classList.toggle('hidden', v !== 'card');
+  $('listView').classList.toggle('hidden', v !== 'list');
+  document.querySelectorAll('#viewSeg button').forEach(b => b.classList.toggle('on', b.dataset.v === v));
+  if (v === 'list') renderList();
+}
+$('viewSeg').onclick = e => { const b = e.target.closest('button'); if (b) setView(b.dataset.v); };
+
+// ===== 音声 =====
 function kana(s){ return /[はへを]/.test(s) ? s.replace(/[\u3041-\u3096]/g, ch => String.fromCharCode(ch.charCodeAt(0) + 0x60)) : s; }
 let jaVoice = null, noteShown = false;
 function pickVoice(){
@@ -319,74 +572,68 @@ function say(text){
     if (busy) setTimeout(() => s.speak(u), 80); else s.speak(u);
   }catch(e){}
 }
-function answer(ok){
-  const c = deck[pos]; if (!c) return;
-  if (ok) known.add(c.n); else known.delete(c.n);
-  store.set('known100', [...known]);
-  const card = document.getElementById('card');
-  card.classList.remove('flip'); card.classList.add(ok ? 'out-r' : 'out-l');
-  setTimeout(() => { pos++; drawChips(); render(); }, 230);
-}
-function attachSwipe(card){
-  let x0 = null, y0 = null, dx = 0, moved = false;
-  card.addEventListener('touchstart', e => { x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; dx = 0; moved = false; }, {passive:true});
-  card.addEventListener('touchmove', e => {
-    if (x0 === null) return;
-    dx = e.touches[0].clientX - x0; const dy = e.touches[0].clientY - y0;
-    if (Math.abs(dx) > 12 && Math.abs(dx) > Math.abs(dy)){ moved = true;
-      card.style.transition = 'none';
-      card.style.transform = `translateX(${dx}px) rotate(${dx/25}deg)` + (flipped ? ' rotateY(180deg)' : ''); }
-  }, {passive:true});
-  card.addEventListener('touchend', e => {
-    card.style.transition = ''; card.style.transform = '';
-    if (moved){ e.preventDefault(); if (Math.abs(dx) > 90) answer(dx > 0); }
-    x0 = null;
-  });
-}
-document.getElementById('ok').onclick = () => answer(true);
-document.getElementById('ng').onclick = () => answer(false);
-document.getElementById('shuffle').onclick = () => build(true);
+
+// ===== ボタン・キーボード =====
+$('ok').onclick = () => answer(true);
+$('ng').onclick = () => answer(false);
+$('prev').onclick = prev;
+$('shuffle').onclick = () => build(true);
 document.addEventListener('keydown', e => {
+  if (e.target.matches('input, select, textarea') || e.metaKey || e.ctrlKey || e.altKey) return;
+  if (sheet.classList.contains('show')){ if (e.key === 'Escape') sheet.classList.remove('show'); return; }
+  const k = e.key.toLowerCase();
+  if (k === 'l'){ setView(view === 'card' ? 'list' : 'card'); return; }
+  if (view !== 'card') return;
   if (e.key === ' ' || e.key === 'Enter'){ e.preventDefault(); flip(); }
   else if (e.key === 'ArrowRight') answer(true);
   else if (e.key === 'ArrowLeft') answer(false);
+  else if (e.key === 'ArrowUp' || e.key === 'Backspace'){ e.preventDefault(); prev(); }
+  else if (k === 's' && deck[pos]) speakFull(deck[pos]);
+  else if (k === 'r') build(true);
 });
-// settings
-const sheet = document.getElementById('sheet');
+
+// ===== 設定 =====
+const sheet = $('sheet');
 function drawSeg(){
   document.querySelectorAll('#modeSeg button').forEach(b => b.classList.toggle('on', b.dataset.m === mode));
   document.querySelectorAll('#ttsSeg button').forEach(b => b.classList.toggle('on', +b.dataset.t === tts));
 }
-document.getElementById('openSet').onclick = () => { drawSeg(); sheet.classList.add('show'); };
-document.getElementById('closeSet').onclick = () => sheet.classList.remove('show');
+$('openSet').onclick = () => { drawSeg(); sheet.classList.add('show'); };
+$('closeSet').onclick = () => sheet.classList.remove('show');
 sheet.addEventListener('click', e => { if (e.target === sheet) sheet.classList.remove('show'); });
 document.querySelectorAll('#modeSeg button').forEach(b => b.onclick = () => { mode = b.dataset.m; store.set('mode', mode); drawSeg(); render(); });
 document.querySelectorAll('#ttsSeg button').forEach(b => b.onclick = () => { tts = +b.dataset.t; store.set('tts', tts); drawSeg(); });
-document.getElementById('reset').onclick = () => document.getElementById('confirm').classList.add('show');
-document.getElementById('resetNo').onclick = () => document.getElementById('confirm').classList.remove('show');
-document.getElementById('resetYes').onclick = () => { known = new Set(); store.set('known100', []); document.getElementById('confirm').classList.remove('show'); sheet.classList.remove('show'); build(false); };
+$('reset').onclick = () => $('confirm').classList.add('show');
+$('resetNo').onclick = () => $('confirm').classList.remove('show');
+$('resetYes').onclick = () => { known = new Set(); store.set('known100', []); $('confirm').classList.remove('show'); sheet.classList.remove('show'); build(false); };
+
 // ===== お知らせ欄・スケジュール =====
-document.getElementById('total').textContent = CARDS.length;
+$('total').textContent = CARDS.length;
 (function(){
-  const news = document.getElementById('news');
+  const news = $('news');
   const next = released < MAXB ? releaseDate(released + 1) : null;
   const left = next ? Math.round((next - today()) / 86400000) : 0;
-  const nextTxt = next ? `次の${EXTRA.filter(c => c.b === released + 1).length}語は <b>${fmt(next)}</b> に追加（あと${left}日）` : 'すべての単語が出そろいました';
-  const plain = () => { news.classList.remove('fresh'); news.innerHTML = `<span>${nextTxt}</span>`; };
+  const nn = next ? EXTRA.filter(c => c.b === released + 1).length : 0;
+  const nextTxt = next
+    ? `<span>次の${nn}語は <b>${fmt(next)}</b> に追加（あと${left}日）<span class="k" lang="ko">다음 ${nn}단어: ${fmtK(next)} 추가 (${left}일 후)</span></span>`
+    : `<span>すべての単語が出そろいました<span class="k" lang="ko">모든 단어가 추가되었어요</span></span>`;
+  const plain = () => { news.classList.remove('fresh'); news.innerHTML = nextTxt; };
   if (released > seenB){
     const n = EXTRA.filter(c => c.b > seenB && c.b <= released).length;
     news.classList.add('fresh');
-    news.innerHTML = `<span>🎉 新しい単語が <b>${n}語</b> 追加されました</span><button id="goNew">新着を見る</button>`;
-    document.getElementById('goNew').onclick = () => { store.set('seenB', released); filter = 'new'; store.set('filter','new'); plain(); build(true); };
+    news.innerHTML = `<span>🎉 新しい単語が <b>${n}語</b> 追加されました<span class="k" lang="ko">새 단어 ${n}개가 추가되었어요</span></span><button id="goNew">新着を見る<small lang="ko">새 단어 보기</small></button>`;
+    $('goNew').onclick = () => { store.set('seenB', released); posF = 'all'; stF = 'new'; store.set('posF', posF); store.set('stF', stF); plain(); setView('card'); build(true); };
   } else plain();
   const rows = [];
   for (let b = 1; b <= MAXB; b++){
     const on = b <= released;
-    rows.push(`<div class="${on ? 'done' : ''}">${on ? '✓' : '・'} 第${b}回　${fmt(releaseDate(b))}　+${EXTRA.filter(c => c.b === b).length}語</div>`);
+    rows.push(`<div class="${on ? 'done' : ''}">${on ? '✓' : '・'} 第${b}回 · ${fmt(releaseDate(b))} <span lang="ko">(${fmtK(releaseDate(b))})</span>　+${EXTRA.filter(c => c.b === b).length}語</div>`);
   }
-  document.getElementById('sched').innerHTML = rows.join('');
+  $('sched').innerHTML = rows.join('');
 })();
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(() => {});
+addEventListener('resize', () => { if (view === 'card' && !flipped) render(); });
+setView(view);
 build(false);
 </script>
 </body>
