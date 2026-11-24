@@ -139,6 +139,10 @@ button{cursor:pointer;border:0;background:none}
 .pic{flex:1;display:flex;align-items:center;justify-content:center;padding:14px 28px;min-height:0}
 .pic img{max-width:100%;max-height:100%;object-fit:contain;border-radius:18px}
 @media (prefers-color-scheme: dark){.pic img,.thumb{background:#fff;padding:8px}}
+.pic.emo span{font-size:132px;line-height:1;filter:drop-shadow(0 10px 18px rgba(0,0,0,.12))}
+.dcard{margin-top:12px;width:100%}
+.dcard .emojis{font-size:26px;letter-spacing:2px;margin-top:8px;line-height:1.2}
+.tile .ic.emo{background:var(--fill2);font-size:24px}
 .hint{text-align:center;font-size:13px;color:var(--label3);padding:0 0 18px;display:flex;flex-direction:column;align-items:center;gap:8px}
 .th{font-size:12.5px;color:var(--label2);background:var(--fill2);border-radius:99px;padding:4px 12px}
 .kofront{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:24px;text-align:center}
@@ -234,6 +238,10 @@ footer a{color:var(--label3)}
 /* ---------- PC ---------- */
 @media (min-width:820px){
   .screen{padding-top:28px;max-width:880px}
+  .pic.emo span{font-size:170px}
+  .tiles.daily{grid-template-columns:repeat(4,1fr)}
+  .tiles.daily .tile{min-height:160px}
+  .dcard{flex-direction:row!important;align-items:center!important;min-height:0!important}
   .ltitle{font-size:48px}
   .lsub{font-size:20px;margin-bottom:30px}
   .levels{grid-template-columns:repeat(3,1fr)}
@@ -271,6 +279,7 @@ footer a{color:var(--label3)}
 </div>
 
 <script src="words.js"></script>
+<script src="daily.js"></script>
 <script>
 // ===== 2週間ごとの自動追加 =====
 // START の日から EVERY 日ごとに、EXTRA の b=1,2,3… の単語が順番に解禁される。
@@ -344,6 +353,14 @@ const posOk = (c, p) => p === 'all' || (p === 'new' ? !!c.b && c.b === released 
 const lvName = lv => LEVELS.find(l => l.v === lv);
 const posName = p => POS.find(x => x.v === p);
 const stats = list => ({n:list.length, d:list.filter(c => known.has(c.n)).length});
+const dcat = v => DAILY_CATS.find(c => c.v === v);
+const isDaily = () => lvF === 'daily';
+function pool(){ return isDaily() ? DAILY.filter(c => posF === 'all' || c.cat === posF) : CARDS.filter(c => lvOk(c, lvF) && posOk(c, posF)); }
+function routeLabel(lv, p){
+  if (lv === 'daily') return {title:'くらし · ' + (p === 'all' ? 'すべて' : dcat(p).j), back:p === 'all' ? 'すべて' : dcat(p).j};
+  const L = lvName(lv), P = posName(p);
+  return {title:(L.v === 'all' ? 'すべて' : L.j) + ' · ' + P.j, back:P.j};
+}
 
 // ===== 画面遷移（#/ → #/N3 → #/N3/名詞） =====
 let screen = '', lvF = 'all', posF = 'all';
@@ -352,7 +369,12 @@ function route(){
   stopAudio();
   const parts = location.hash.replace(/^#\/?/, '').split('/').filter(Boolean).map(decodeURIComponent);
   const lv = parts[0], p = parts[1];
-  if (lv && lvName(lv) && p && posName(p)){ lvF = lv; posF = p; store.set('last', location.hash); showStudy(); }
+  if (lv === 'daily'){
+    lvF = 'daily';
+    if (p && (p === 'all' || dcat(p))){ posF = p; store.set('last', location.hash); showStudy(); }
+    else showDailyCats();
+  }
+  else if (lv && lvName(lv) && p && posName(p)){ lvF = lv; posF = p; store.set('last', location.hash); showStudy(); }
   else if (lv && lvName(lv)){ lvF = lv; showCats(); }
   else showHome();
   window.scrollTo(0, 0);
@@ -362,11 +384,11 @@ addEventListener('hashchange', route);
 // ===== ホーム：レベルを選ぶ =====
 function showHome(){
   screen = 'home';
-  const all = stats(CARDS), pct = all.n ? all.d / all.n : 0;
+  const all = stats(CARDS.concat(DAILY)), pct = all.n ? all.d / all.n : 0;
   const C = 2 * Math.PI * 32;
   const last = store.get('last', '');
   const lastParts = last.replace(/^#\/?/, '').split('/').filter(Boolean).map(decodeURIComponent);
-  const lastLabel = lastParts.length === 2 && lvName(lastParts[0]) && posName(lastParts[1]) ? `${lvName(lastParts[0]).j} · ${posName(lastParts[1]).j}` : '';
+  const lastLabel = lastParts.length === 2 && ((lastParts[0] === 'daily' && (lastParts[1] === 'all' || dcat(lastParts[1]))) || (lvName(lastParts[0]) && posName(lastParts[1]))) ? routeLabel(lastParts[0], lastParts[1]).title : '';
   const next = released < MAXB ? releaseDate(released + 1) : null;
   const left = next ? Math.round((next - today()) / 86400000) : 0;
   const nn = next ? EXTRA.filter(c => c.b === released + 1).length : 0;
@@ -392,10 +414,19 @@ function showHome(){
           <div class="bottom"><div class="meter"><i style="width:${s.n ? s.d/s.n*100 : 0}%"></i></div>
           <div class="cnt">${s.d} / ${s.n} 語 · <span lang="ko">${s.d} / ${s.n} 단어</span></div></div></div>${ICON.chev}</button>`;
     }).join('')}</div>
+    <div class="sect">くらしの単語 · <span lang="ko">생활 단어</span></div>
+    ${(() => { const s = stats(DAILY); return `<button class="lcard dcard" id="goDaily">
+        <div class="badge" style="background:linear-gradient(135deg,#30d158,#30b0c7)">🏠</div>
+        <div class="body"><div class="t">くらしの単語<span class="ko" lang="ko">생활 단어</span></div>
+          <div class="d">名詞だけ · 野菜・台所・服・町など ${DAILY_CATS.length}テーマ<span lang="ko">명사만 · 채소·부엌·옷·동네 등 ${DAILY_CATS.length}개 주제</span></div>
+          <div class="emojis">${DAILY_CATS.map(c => c.e).join('')}</div>
+          <div class="bottom"><div class="meter"><i style="width:${s.n ? s.d/s.n*100 : 0}%"></i></div>
+          <div class="cnt">${s.d} / ${s.n} 語 · <span lang="ko">${s.d} / ${s.n} 단어</span></div></div></div>${ICON.chev}</button>`; })()}
     <p class="next">${next ? `次の${nn}語は ${fmt(next)} に追加（あと${left}日）<br><span lang="ko">다음 ${nn}단어는 ${fmtK(next)}에 추가 (${left}일 후)</span>` : 'すべての単語が出そろいました · <span lang="ko">모든 단어가 추가되었어요</span>'}</p>
     <footer>イラスト：<a href="https://www.irasutoya.com/">いらすとや</a></footer>
   </div>`;
-  app.querySelectorAll('.lcard').forEach(b => b.onclick = () => go('#/' + b.dataset.lv));
+  app.querySelectorAll('.lcard[data-lv]').forEach(b => b.onclick = () => go('#/' + b.dataset.lv));
+  $('goDaily').onclick = () => go('#/daily');
   $('openSet').onclick = () => openSheet();
   const r = $('resume'); if (r) r.onclick = () => go(last);
   const g = $('goNew'); if (g) g.onclick = () => { seenB = released; store.set('seenB', released); go('#/all/new'); };
@@ -433,11 +464,38 @@ function showCats(){
   $('theme').onchange = e => { themeF = e.target.value; store.set('themeF', themeF); showCats(); };
 }
 
+// ===== くらしの単語：テーマを選ぶ =====
+function showDailyCats(){
+  screen = 'cats';
+  const tile = (v, j, ko, e, wide) => {
+    const s = stats(DAILY.filter(c => v === 'all' || c.cat === v));
+    return `<button class="tile${wide ? ' wide' : ''}" data-p="${v}">
+      <div class="ic emo">${e}</div>
+      <div class="t">${j}<span class="ko" lang="ko">${ko}</span></div>
+      <div class="bottom"><div class="cnt"><span>${s.n} 語</span><span>${s.d} ✓</span></div><div class="meter"><i style="width:${s.n ? s.d/s.n*100 : 0}%"></i></div></div></button>`;
+  };
+  app.innerHTML = `<div class="screen">
+    <div class="navbar"><button class="navback" id="back">${ICON.back}ホーム · <span lang="ko">홈</span></button><button class="iconbtn" id="openSet" aria-label="設定 설정">${ICON.gear}</button></div>
+    <h1 class="ltitle">くらしの単語</h1>
+    <p class="lsub">テーマを選ぶ · <span lang="ko">주제 선택</span></p>
+    <div class="tiles daily">${DAILY_CATS.map(c => tile(c.v, c.j, c.ko, c.e)).join('')}${tile('all', 'すべてのテーマ', '모든 주제', '🗂️', true)}</div>
+    <div class="sect">オプション · <span lang="ko">옵션</span></div>
+    <div class="group">
+      <label class="cell"><span class="l">まだ覚えていない単語だけ<small lang="ko">아직 못 외운 단어만</small></span>
+        <span class="switch"><input type="checkbox" id="onlyTodo" ${onlyTodo ? 'checked' : ''}><i></i></span></label>
+    </div>
+  </div>`;
+  $('back').onclick = () => go('#/');
+  $('openSet').onclick = () => openSheet();
+  app.querySelectorAll('.tile').forEach(b => b.onclick = () => go('#/daily/' + b.dataset.p));
+  $('onlyTodo').onchange = e => { onlyTodo = e.target.checked; store.set('onlyTodo', onlyTodo); };
+}
+
 // ===== 学習 =====
 let deck = [], pos = 0, flipped = false, view = 'card', query = '';
 function makeDeck(shuffle){
   const st = onlyTodo ? 'todo' : stF;
-  deck = CARDS.filter(c => lvOk(c, lvF) && posOk(c, posF) && (themeF === 'all' || c.th === themeF)
+  deck = pool().filter(c => (isDaily() || themeF === 'all' || c.th === themeF)
     && (st === 'all' || (st === 'todo' ? !known.has(c.n) : known.has(c.n))));
   if (st === 'all') deck = deck.filter(c => !known.has(c.n)).concat(deck.filter(c => known.has(c.n)));
   if (shuffle) for (let i = deck.length-1; i > 0; i--){ const j = Math.floor(Math.random()*(i+1)); [deck[i], deck[j]] = [deck[j], deck[i]]; }
@@ -447,11 +505,11 @@ function showStudy(){
   screen = 'study'; view = 'card'; query = '';
   if (posF === 'new'){ seenB = Math.max(seenB, released); store.set('seenB', seenB); }
   makeDeck(false);
-  const L = lvName(lvF), P = posName(posF);
+  const RL = routeLabel(lvF, posF);
   app.innerHTML = `<div class="screen study">
     <div class="navbar">
-      <button class="navback" id="back">${ICON.back}<span>${P.j}</span></button>
-      <div class="ntitle"><b>${L.v === 'all' ? 'すべて' : L.j} · ${P.j}</b><small id="ncount"></small></div>
+      <button class="navback" id="back">${ICON.back}<span>${RL.back}</span></button>
+      <div class="ntitle"><b>${RL.title}</b><small id="ncount"></small></div>
       <div class="nright"><button class="iconbtn" id="viewBtn" aria-label="一覧 목록">${ICON.list}</button><button class="iconbtn" id="openSet" aria-label="設定 설정">${ICON.sliders}</button></div>
     </div>
     <div class="pbar"><i id="pbar"></i></div>
@@ -500,7 +558,7 @@ function renderCard(){
   $('ok').style.visibility = $('ng').style.visibility = showBtns ? 'visible' : 'hidden';
   if (pos >= deck.length){
     const hasTodo = deck.some(c => !known.has(c.n));
-    const all = CARDS.filter(c => lvOk(c, lvF) && posOk(c, posF));
+    const all = pool();
     const allDone = all.length && all.every(c => known.has(c.n));
     stage.innerHTML = `<div class="empty">
       <div class="emoji">${allDone ? '🎉' : deck.length ? '👏' : '🔍'}</div>
@@ -508,8 +566,8 @@ function renderCard(){
       <div class="btns">
         ${hasTodo ? '<button class="pbtn" id="again">「まだ」だけもう一度<small lang="ko">모르는 단어만 다시</small></button>' : ''}
         ${deck.length ? '<button class="pbtn gray" id="restart">最初からシャッフル<small lang="ko">처음부터 섞어서</small></button>' : ''}
-        ${!deck.length && (onlyTodo || themeF !== 'all' || stF !== 'all') ? '<button class="pbtn" id="clearF">しぼりこみを解除<small lang="ko">필터 해제</small></button>' : ''}
-        <button class="pbtn gray" id="toCats">ほかの品詞を選ぶ<small lang="ko">다른 품사 선택</small></button>
+        ${!deck.length && (onlyTodo || (!isDaily() && themeF !== 'all') || stF !== 'all') ? '<button class="pbtn" id="clearF">しぼりこみを解除<small lang="ko">필터 해제</small></button>' : ''}
+        <button class="pbtn gray" id="toCats">${isDaily() ? 'ほかのテーマを選ぶ<small lang="ko">다른 주제 선택</small>' : 'ほかの品詞を選ぶ<small lang="ko">다른 품사 선택</small>'}</button>
       </div></div>`;
     const a = $('again'); if (a) a.onclick = () => { deck = deck.filter(c => !known.has(c.n)); pos = 0; renderCard(); };
     const r = $('restart'); if (r) r.onclick = () => { makeDeck(true); renderCard(); };
@@ -517,12 +575,13 @@ function renderCard(){
     $('toCats').onclick = () => go('#/' + lvF);
     return;
   }
-  const c = deck[pos], col = LVCOL[c.lv];
-  const pill = `<span class="pill" style="background:color-mix(in srgb, ${col} 14%, transparent);color:${col}">${c.lv}</span>`;
+  const c = deck[pos], col = c.cat ? 'var(--teal)' : LVCOL[c.lv], C = c.cat ? dcat(c.cat) : null;
+  const pill = `<span class="pill" style="background:color-mix(in srgb, ${col} 14%, transparent);color:${col}">${C ? C.e + ' ' + C.j : c.lv}</span>`;
   const posPill = `<span class="pill" style="background:var(--fill2);color:var(--label2)">${c.pos}<span class="ko" lang="ko">${POS_KO[c.pos] || ''}</span></span>`;
   const top = `<div class="ctop"><span>${pill}${c.b && c.b === released ? '<span class="newb">NEW</span>' : ''}</span>${known.has(c.n) ? `<span class="done-mark">✓ 覚えた</span>` : ''}${posPill}</div>`;
   const tap = isPC() ? 'クリックで答え · <span lang="ko">클릭해서 정답</span>' : 'タップで答え · <span lang="ko">탭해서 정답</span>';
-  const themeTag = `<span class="th">${c.th} · <span lang="ko">${TH_KO[c.th] || ''}</span></span>`;
+  const thJ = C ? C.j : c.th, thK = C ? C.ko : (TH_KO[c.th] || '');
+  const themeTag = `<span class="th">${thJ} · <span lang="ko">${thK}</span></span>`;
   const [s0, sk0, h0] = c.ex[0];
   const clozeHtml = `<div class="cloze"><div class="lab">（　）に入る言葉は？ · <span lang="ko">빈칸에 들어갈 말은?</span></div>
       <div class="s">${esc(s0).replace(esc(h0), `<span class="blank" style="color:${col}"></span>`)}</div>
@@ -530,7 +589,10 @@ function renderCard(){
       <div class="hint">${themeTag}${tap}</div>`;
   const front = mode === 'ko'
     ? `<div class="kofront"><div class="big" lang="ko">${esc(c.ko)}</div><small>日本語で言うと？ · <span lang="ko">일본어로 하면?</span></small></div><div class="hint">${themeTag}${tap}</div>`
-    : mode === 'pic' && c.img ? `<div class="pic"><img src="${c.img}" alt=""></div><div class="hint">${themeTag}${tap}</div>` : clozeHtml;
+    : mode === 'pic' && c.img ? `<div class="pic"><img src="${c.img}" alt=""></div><div class="hint">${themeTag}${tap}</div>`
+    : mode === 'pic' && c.e ? `<div class="pic emo"><span>${c.e}</span></div><div class="hint">${themeTag}${tap}</div>`
+    : mode === 'pic' && C ? `<div class="kofront"><div class="big" lang="ko">${esc(c.ko)}</div><small>日本語で言うと？ · <span lang="ko">일본어로 하면?</span></small></div><div class="hint">${themeTag}${tap}</div>`
+    : clozeHtml;
   const exHtml = c.ex.map(([s, sk, h]) => `<div class="exi"><div class="exj">${esc(s).replace(esc(h), `<b style="color:${col}">${esc(h)}</b>`)}</div><div class="exk" lang="ko">${esc(sk)}</div></div>`).join('');
   stage.innerHTML = `<div class="card" id="card">
     <div class="face front">${top}${front}</div>
@@ -538,8 +600,8 @@ function renderCard(){
       <div class="ans"><div class="yomi">${c.y}</div><div class="kanji" style="${c.k.length >= 5 ? 'font-size:36px' : ''}">${c.k}</div>
         <div class="kor" lang="ko">${esc(c.ko)}</div>
         ${c.masu ? `<div class="masu">ます形 · ${c.masu}</div>` : ''}
-        <div class="meta"><span>${c.th} · <span lang="ko">${TH_KO[c.th] || ''}</span></span>${mode !== 'pic' && c.img ? `<img class="thumb" src="${c.img}" alt="">` : ''}</div>
-        <div class="pt"><b>ポイント</b>　${esc(c.pt)}</div>
+        <div class="meta"><span>${thJ} · <span lang="ko">${thK}</span></span>${mode !== 'pic' && c.img ? `<img class="thumb" src="${c.img}" alt="">` : ''}</div>
+        ${c.pt ? `<div class="pt"><b>ポイント</b>　${esc(c.pt)}</div>` : ''}
         <button class="speak" id="speak">${ICON.speaker}読み上げ · <span lang="ko">듣기</span></button></div>
       <div class="ex">${exHtml}</div>
     </div></div>`;
@@ -610,7 +672,7 @@ function openSheet(){
     <div class="group">
       <div class="cell col"><span class="l">表示する単語<small lang="ko">보여 줄 단어</small></span>
         ${segHtml('stSeg', [['all','全部','전체'],['todo','まだ','미암기'],['done','覚えた','암기']], onlyTodo ? 'todo' : stF)}</div>
-      <label class="cell"><span class="l">テーマ<small lang="ko">테마</small></span>
+      <label class="cell${isDaily() ? ' hidden' : ''}"><span class="l">テーマ<small lang="ko">테마</small></span>
         <select class="select" id="theme2"><option value="all">すべて · 전체</option>${THEMES.map(([t,k]) => `<option value="${t}" ${themeF === t ? 'selected' : ''}>${t} · ${k}</option>`).join('')}</select></label>
       <button class="cell" id="shuffle" style="width:100%;color:var(--blue)"><span class="l" style="text-align:left">シャッフルして最初から<small lang="ko">섞어서 처음부터</small></span></button>
     </div>` : ''}

@@ -1,7 +1,7 @@
 // オフラインでも使えるようにするためのキャッシュ。
 // ページと単語データは「ネット優先」（更新がすぐ届く）、画像と音声は「キャッシュ優先」。
-const CACHE = 'tango-v3';
-self.addEventListener('install', e => { self.skipWaiting(); e.waitUntil(caches.open(CACHE).then(c => c.addAll(['./', 'index.html', 'words.js', 'manifest.json', 'icon.svg']))); });
+const CACHE = 'tango-v4';
+self.addEventListener('install', e => { self.skipWaiting(); e.waitUntil(caches.open(CACHE).then(c => c.addAll(['./', 'index.html', 'words.js', 'daily.js', 'manifest.json', 'icon.svg']))); });
 self.addEventListener('activate', e => { e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim())); });
 self.addEventListener('fetch', e => {
   const req = e.request; if (req.method !== 'GET' || req.headers.has('range') || new URL(req.url).origin !== location.origin) return;
