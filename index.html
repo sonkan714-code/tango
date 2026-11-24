@@ -483,7 +483,7 @@ function showDailyCats(){
     <div class="navbar"><button class="navback" id="back">${ICON.back}ホーム · <span lang="ko">홈</span></button><button class="iconbtn" id="openSet" aria-label="設定 설정">${ICON.gear}</button></div>
     <h1 class="ltitle">くらしの単語</h1>
     <p class="lsub">テーマを選ぶ · <span lang="ko">주제 선택</span></p>
-    <div class="tiles daily">${DAILY_CATS.map(c => tile(c.v, c.j, c.ko, `<img src="${c.img}" alt="">`)).join('')}${tile('all', 'すべてのテーマ', '모든 주제', '<img src="img/e/1f5c3.png" alt="">', true)}</div>
+    <div class="tiles daily">${tile('all', 'すべてのテーマ', '모든 주제', '<img src="img/e/1f5c3.png" alt="">', true)}${DAILY_CATS.map(c => tile(c.v, c.j, c.ko, `<img src="${c.img}" alt="">`)).join('')}</div>
     <div class="sect">オプション · <span lang="ko">옵션</span></div>
     <div class="group">
       <label class="cell"><span class="l">まだ覚えていない単語だけ<small lang="ko">아직 못 외운 단어만</small></span>
